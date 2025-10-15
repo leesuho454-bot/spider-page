@@ -1,63 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>My Spider Man Forever</title>
   <style>
-    body, html {
+    html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       overflow: hidden;
-      background: #000;  /* black background for contrast */
+      height: 100%;
+      background: #000;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
       text-align: center;
     }
 
-    #webCanvas {
+    canvas {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;  /* canvas doesn’t block clicks */
       z-index: 1;
+      pointer-events: none;
     }
 
     .content {
       position: relative;
       z-index: 2;
-      max-width: 90%;
       color: #ff3366;
     }
 
     .content img {
       max-width: 80vw;
       max-height: 60vh;
-      border: 5px solid #ff3366;
-      border-radius: 10px;
-      margin-bottom: 20px;
+      border: 4px solid #ff3366;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
     }
 
     .message {
       font-size: 2em;
-      margin-top: 10px;
-    }
-
-    .upload-btn {
-      margin: 15px;
-      padding: 8px 16px;
-      font-size: 1em;
-      background: #ff3366;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -65,72 +50,55 @@
   <canvas id="webCanvas"></canvas>
 
   <div class="content">
-    <input type="file" id="photoInput" accept="image/*" class="upload-btn" />
-    <div>
-      <img id="uploadedPhoto" src="" alt="Your Spider Man Photo" style="display: none;" />
-    </div>
+    <img src="spiderman-kiss.png" alt="Spider-Man Kiss" />
     <div class="message">My Spider Man Forever ❤️</div>
   </div>
 
   <script>
-    // Spider web animation on canvas (simple lines)
-    const canvas = document.getElementById('webCanvas');
-    const ctx = canvas.getContext('2d');
-    function resize() {
+    // Web animation
+    const canvas = document.getElementById("webCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    function drawWeb() {
+    function drawWebs() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
-
-      const maxR = Math.hypot(cx, cy);
       const spokes = 12;
+      const loops = 7;
+      const maxRadius = Math.min(canvas.width, canvas.height) / 2;
 
-      // draw radial lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 1;
+
       for (let i = 0; i < spokes; i++) {
-        const angle = (i / spokes) * Math.PI * 2 + performance.now() * 0.0002;
+        const angle = (i / spokes) * Math.PI * 2;
+        const x = cx + Math.cos(angle) * maxRadius;
+        const y = cy + Math.sin(angle) * maxRadius;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR);
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-        ctx.lineWidth = 1;
+        ctx.lineTo(x, y);
         ctx.stroke();
       }
 
-      // draw spiral web
-      ctx.beginPath();
-      const loops = 8;
-      for (let t = 0; t < Math.PI * 2 * loops; t += 0.02) {
-        const r = (t / (Math.PI * 2 * loops)) * maxR;
-        const angle = t + performance.now() * 0.0001;
-        const x = cx + Math.cos(angle) * r;
-        const y = cy + Math.sin(angle) * r;
-        if (t === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      for (let r = 0; r < loops; r++) {
+        const radius = ((r + 1) / loops) * maxRadius;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
       }
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
 
-      requestAnimationFrame(drawWeb);
+      requestAnimationFrame(drawWebs);
     }
-    drawWeb();
 
-    // Handle image upload
-    const photoInput = document.getElementById('photoInput');
-    const uploadedPhoto = document.getElementById('uploadedPhoto');
-    photoInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      uploadedPhoto.src = url;
-      uploadedPhoto.style.display = 'block';
-    });
+    drawWebs();
   </script>
 </body>
 </html>
+
